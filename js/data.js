@@ -41,7 +41,7 @@ window.SOUNDS = [
   { no: 8,  name: '相声',         seg: 'midSouth', place: '大栅栏 · 广德楼',
     level: { kind: 'nat',    text: '国家级非遗' }, type: '曲艺' },
   { no: 9,  name: '昆曲',         seg: 'midNorth', place: '故宫戏台 · 端门昇平署',
-    level: { kind: 'tbd',    text: '级别待补' }, type: '戏曲', deep: true, music: 'm-midNorth' },
+    level: { kind: 'nat',    text: '世界级非遗 · 国家级非遗' }, type: '戏曲', deep: true, music: 'm-midNorth' },
   { no: 10, name: '智化寺京音乐', seg: 'midNorth', place: '智化寺 · 智化殿',
     level: { kind: 'nat',    text: '国家级非遗' }, type: '礼乐' },
   { no: 11, name: '北京鸽哨',     seg: 'north',    place: '钟鼓楼片区',
