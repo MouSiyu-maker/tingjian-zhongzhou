@@ -1470,6 +1470,14 @@
     const inner = $('.smap-in', m), go = $('#smap-go'), bar = $('#sbar'), th = $('#sb-th');
     const pins = $$('.pin', m), sbs = $$('.sb', bar);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /* 挖掘页锁死纵向滑动，仅长卷横向与展开文案可滑 */
+    const lockY = (e) => {
+      if (!app.classList.contains('is-dig')) return;
+      const t = e.target;
+      if (t.closest && (t.closest('.smap-sc') || t.closest('.ov-body') || t.closest('.pincard'))) return;
+      e.preventDefault();
+    };
+    document.addEventListener('touchmove', lockY, { passive: false });
     /* 长卷高度随屏幕自适应：标题 + 长卷 + 滑动条一屏收齐 */
     const fit = () => {
       inner.style.zoom = 1;
@@ -1485,6 +1493,9 @@
     const toBar = (f) => { f = Math.max(0, Math.min(1, f)); const i = Math.max(0, SEGSPAN.findIndex(([, a, b]) => f <= b)); const [, a, b] = SEGSPAN[i]; return bc[i] + (f - a) / (b - a) * BARW[i]; };
     const fromBar = (g) => { g = Math.max(0, Math.min(1, g)); let i = bc.findIndex((c, k) => k > 0 && g <= c) - 1; if (i < 0) i = 0; const [, a, b] = SEGSPAN[i]; return a + (g - bc[i]) / BARW[i] * (b - a); };
     m.scrollLeft = 0;                                   // 从最南端开始，向北展开
+    /* 长卷始终全彩：不再用 --lit / .lit 做灰→金揭示 */
+    inner.style.setProperty('--lit', '100%');
+    pins.forEach((p) => p.classList.add('lit'));
     let reach = 0, raf = 0, auto = false, cur = -1;
     const upd = () => {
       const sw = m.scrollWidth, l = m.scrollLeft / sw, r = (m.scrollLeft + m.clientWidth) / sw;
@@ -1493,9 +1504,8 @@
       const mid = (l + r) / 2, k = Math.max(0, SEGSPAN.findIndex(([, , b]) => mid <= b));
       if (k !== cur) { cur = k; sbs.forEach((e, i) => e.classList.toggle('is-on', i === k)); bar.setAttribute('aria-valuetext', SEGSPAN[k][3]); }
       bar.setAttribute('aria-valuenow', Math.round(gl * 100));
-      if (r > reach) {                                                       // 目光所及的最北处
-        reach = r; inner.style.setProperty('--lit', (Math.min(1, reach) * 100).toFixed(2) + '%');
-        pins.forEach((p) => { p.classList.toggle('lit', +p.dataset.pos <= reach - 0.012); });
+      if (r > reach) {                                                       // 目光所及的最北处（仅更新分段进度条）
+        reach = r;
         SEGSPAN.forEach(([, a, b], i) => { sbs[i].firstElementChild.firstElementChild.style.width = (Math.max(0, Math.min(1, (reach - a) / (b - a))) * 100).toFixed(1) + '%'; });
       }
     };
@@ -1503,7 +1513,7 @@
     const run = () => {
       stop();
       const max = m.scrollWidth - m.clientWidth, from = m.scrollLeft >= max - 4 ? 0 : m.scrollLeft;
-      if (from === 0) { m.scrollLeft = 0; reach = 0; inner.style.setProperty('--lit', '0%'); pins.forEach((p) => p.classList.remove('lit')); $$('.tr u', bar).forEach((u) => { u.style.width = '0%'; }); }
+      if (from === 0) { m.scrollLeft = 0; reach = 0; $$('.tr u', bar).forEach((u) => { u.style.width = '0%'; }); }
       const dur = Math.max(2500, (max - from) / max * 11000), t0 = performance.now();
       auto = true; go.classList.add('is-on'); go.querySelector('b').textContent = '停下';
       const ease = (t) => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
@@ -1541,7 +1551,12 @@
       io = new IntersectionObserver((es) => { if (es[0].isIntersecting) { io.disconnect(); timer = setTimeout(() => { if (!auto && m.scrollLeft < 8) run(); }, 700); } }, { threshold: .6 });
       io.observe(m);
     }
-    mapAbort = () => { stop(); clearTimeout(timer); io && io.disconnect(); window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); window.removeEventListener('resize', onResize); mapAbort = null; };
+    mapAbort = () => {
+      stop(); clearTimeout(timer); io && io.disconnect();
+      document.removeEventListener('touchmove', lockY);
+      window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); window.removeEventListener('resize', onResize);
+      mapAbort = null;
+    };
     window.__map = { m, stop, upd, fit };
     if (Player.cur && isSnd(Player.cur.key)) { const ps = SOUNDS.find((x) => x.key === Player.cur.key); if (ps) pickPin(ps.id); }   // 带着正在播放的声音进入：弹出对应信息卡
   }

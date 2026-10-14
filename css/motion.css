@@ -53,13 +53,14 @@
 .smap-go.is-on i { width: 9px; height: 9px; border-top: 0; border-bottom: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
 
 /* 长卷始终全彩，不再灰→金渐进（避免进入页瞬间全灰） */
-.smap-in .strip.base { filter: none; opacity: 1; }
-.smap-in .strip.lit { display: none; }
-.pin { opacity: 1; filter: none; }
-.pin-tag { transform: translateX(-50%); transition: background .2s, box-shadow .2s; }
+.smap-in .strip.base { filter: none !important; opacity: 1 !important; }
+.smap-in .strip.lit { display: none !important; }
+.pin, .pin:not(.lit) { opacity: 1 !important; filter: none !important; }
+.pin-tag { transform: translateX(-50%) !important; transition: background .2s, box-shadow .2s; }
 .pin-pic { transform: scale(1); transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
+.pin:not(.lit) .pin-pic { transform: scale(1) !important; }
 .pin.is-sel { z-index: 4; }
-.pin.is-sel .pin-pic { transform: scale(1.14); box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--red), 0 0 0 10px rgba(158, 64, 42, .16); }
+.pin.is-sel .pin-pic { transform: scale(1.14) !important; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--red), 0 0 0 10px rgba(158, 64, 42, .16); }
 .pin.is-sel .pin-tag { background: linear-gradient(#7A3020, #5E2416); }
 .pin-tag, .pin-pic { cursor: pointer; }
 
@@ -1025,16 +1026,20 @@
 .pincard .pc-x { position: absolute; right: 4px; top: -10px; width: 24px; height: 24px; border-radius: 50%; background: var(--paper); color: var(--ink-2); font: 400 16px/22px var(--sans); text-align: center; box-shadow: 0 0 0 1px var(--line-2), var(--lift-s); }
 
 /* ---------- 挖掘：不滚动的完整页面 + 渐变蒙层说明 ---------- */
-html:has(#app.is-dig), body:has(#app.is-dig) { overflow: hidden; height: 100%; overscroll-behavior: none; }
+html:has(#app.is-dig), body:has(#app.is-dig) {
+  overflow: hidden !important; height: 100%; position: fixed; inset: 0; width: 100%;
+  overscroll-behavior: none; touch-action: none;
+}
 #app.is-dig, #app.is-one { height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: calc(var(--tab-h) + var(--safe-b)); overscroll-behavior: none; }
-#app.is-dig { touch-action: none; }
+#app.is-dig { touch-action: none; overflow: hidden; }
 #app.is-dig.has-mini, #app.is-one.has-mini { padding-bottom: calc(var(--tab-h) + var(--mini-h) + var(--safe-b)); }
 .dig-page { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; touch-action: none; }
 .dig-page .smap { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .dig-page .smap-vw { flex: 1; min-height: 0; overflow: hidden; }
-.dig-page .smap-sc { height: 100%; touch-action: pan-x; overscroll-behavior: contain none; }
+.dig-page .smap-sc { height: 100%; touch-action: pan-x; overscroll-behavior: none; overflow-x: auto; overflow-y: hidden; }
 .dig-page .sbar { flex: none; touch-action: none; }
-.dig-page .dig-ov { touch-action: pan-y; }
+.dig-page .dig-ov.is-open { touch-action: pan-y; }
+.dig-page .dig-head, .dig-page .smap-hd { touch-action: none; }
 .dig-head.pagehead.compact { flex: none; padding: var(--pad-head-t) var(--pad-x) 12px; }
 .dig-head .ph-row { align-items: center; }
 .dig-head .h1 { margin-top: 0; }
