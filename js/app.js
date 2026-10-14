@@ -338,7 +338,6 @@
         <div class="cf-med"><img class="cf-ring" src="${IMG}petal-ring.svg" alt=""><div class="cf-photo">${photo(s)}</div><span class="cf-no">${s.id}</span></div>
         <div class="cf-info">
           <h3>${esc(s.name)}</h3>
-          <p>${esc(s.place)}</p>
           <div class="mt">${seal(s.level)}<span class="chip">${esc(s.type)}</span></div>
           <div class="cf-act">${playBtn(s.key)}<a class="cf-more" href="#/sound/${s.id}">查看详情 ›</a></div>
         </div>

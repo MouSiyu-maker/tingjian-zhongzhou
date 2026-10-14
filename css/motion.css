@@ -161,10 +161,6 @@
   margin-top: 0; font: 700 24px/1.2 var(--serif); letter-spacing: .1em; color: var(--ink-d);
   white-space: nowrap; overflow: hidden; text-overflow: clip;
 }
-.cf-info p {
-  margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--ink-2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
 .cf-info .mt { display: flex; justify-content: center; flex-wrap: nowrap; gap: 6px; margin-top: 6px; }
 .cf-act { display: flex; align-items: center; justify-content: center; flex-wrap: nowrap; gap: 12px; margin-top: 8px; }
 .cf-more {
