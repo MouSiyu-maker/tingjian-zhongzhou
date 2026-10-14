@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#A71F2D">
+  <title>听见中轴 · 声景智创工作坊</title>
+  <link rel="stylesheet" href="css/style.css?v=93">
+  <link rel="stylesheet" href="css/motion.css?v=99">
+</head>
+<body>
+  <div id="app">
+    <header class="top">
+      <a href="#/home" aria-label="听见中轴 首页"><img class="logo" src="assets/img/logo-h.png" alt="听见中轴 声景智创工作坊"></a>
+      <button class="snd" id="snd" type="button" aria-label="声音开关"><i></i><span>声音 开</span></button>
+    </header>
+
+    <main id="view"></main>
+
+    <div class="mini" id="mini" hidden>
+      <div class="bar"><i id="mini-fill"></i></div>
+      <a class="info" id="mini-info" href="#/dig"><b id="mini-title"></b><small id="mini-sub"></small></a>
+      <button class="pbtn" id="mini-btn" type="button" aria-label="播放 / 暂停">
+        <svg class="i-play" viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg>
+        <svg class="i-pause" viewBox="0 0 16 16"><path d="M3.5 2h3v12h-3zM9.5 2h3v12h-3z"/></svg>
+      </button>
+      <button class="nx" id="mini-next" type="button" aria-label="下一首">⏭</button>
+      <button class="cl" id="mini-close" type="button" aria-label="关闭播放条"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    </div>
+
+    <nav class="tabs" id="tabs" aria-label="主导航">
+      <i class="tabs-ink" id="tabs-ink"></i>
+      <a href="#/home"    data-tab="home"><span class="seal-c">序</span><small>总览</small></a>
+      <a href="#/dig"     data-tab="dig"><span class="seal-c">挖</span><small>挖掘</small></a>
+      <a href="#/explain" data-tab="explain"><span class="seal-c">阐</span><small>阐释</small></a>
+      <a href="#/create"  data-tab="create"><span class="seal-c">创</span><small>创化</small></a>
+      <a href="#/show"    data-tab="show"><span class="seal-c">传</span><small>传播</small></a>
+    </nav>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+
+  <script src="js/sounds.gen.js?v=52"></script>
+  <script src="js/project.gen.js?v=91"></script>
+  <script src="js/data.js?v=93"></script>
+  <script src="js/player.js?v=94"></script>
+  <script src="js/motion.js?v=99"></script>
+  <script src="js/app.js?v=100"></script>
+</body>
+</html>
