@@ -130,7 +130,13 @@ details > summary::-webkit-details-marker { display: none; }
 .mini .bar { position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(255, 255, 255, .16); }
 .mini .bar i { display: block; height: 100%; width: 0; background: var(--cream); }
 .mini .pbtn { width: 36px; height: 36px; background: var(--cream); color: var(--red); }
-.mini .nx { width: 30px; height: 30px; color: rgba(247, 240, 228, .8); font-size: 18px; }
+.mini .nx {
+  flex: none; display: grid; place-items: center; width: 30px; height: 30px; margin: 0; padding: 0;
+  border: 0; border-radius: 50%; background: transparent; color: rgba(247, 240, 228, .8);
+  transition: background .2s, color .2s;
+}
+.mini .nx:hover, .mini .nx:active { background: rgba(255, 255, 255, .14); color: var(--paper); }
+.mini .nx svg { width: 15px; height: 15px; fill: currentColor; }
 
 /* ---------- 播放按钮 ---------- */
 .pbtn {
