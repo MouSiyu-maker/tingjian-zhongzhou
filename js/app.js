@@ -334,11 +334,9 @@
   const SHORT = { south: '南段', midSouth: '中南', midNorth: '中北', north: '北段', newNorth: '新北' };
   function carousel() {
     const items = ORDER.map((s, i) => {
-      const seg = SEG[s.seg];
       return `<article class="cf-item" data-i="${i}" data-seg="${s.seg}" data-no="${s.id}">
         <div class="cf-med"><img class="cf-ring" src="${IMG}petal-ring.svg" alt=""><div class="cf-photo">${photo(s)}</div><span class="cf-no">${s.id}</span></div>
         <div class="cf-info">
-          <div class="cf-seg">${esc(seg.name)} · ${esc(seg.tag)}</div>
           <h3>${esc(s.name)}</h3>
           <p>${esc(s.place)}</p>
           <div class="mt">${seal(s.level)}<span class="chip">${esc(s.type)}</span></div>
