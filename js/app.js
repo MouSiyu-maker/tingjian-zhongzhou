@@ -1036,7 +1036,7 @@
     });
   }
 
-  /* 传播页：现场图 — 自动滚动 + 手指/鼠标横滑 */
+  /* 传播页：现场图 — 自动快滑；手指横滑时暂停，松手后继续 */
   let showFieldAbort = null;
   function initShowField() {
     if (showFieldAbort) showFieldAbort();
@@ -1050,26 +1050,33 @@
       else if (marq.scrollLeft < 0) marq.scrollLeft += h;
     };
     let raf = 0, paused = false, idle = 0, drag = false, moved = false, sx = 0, sl = 0;
+    /* ≈ 18s 滚完半轨（约 3 倍于原先） */
+    const pxPerMs = () => Math.max(0.09, half() / 18000);
     const tick = (t) => {
       if (!paused && !reduce) {
         if (!tick.t0) tick.t0 = t;
         const dt = Math.min(48, t - tick.t0); tick.t0 = t;
-        marq.scrollLeft += dt * 0.028;   // ≈ 48s 滚完半轨
+        marq.scrollLeft += dt * pxPerMs();
         wrap();
       } else tick.t0 = t;
       raf = requestAnimationFrame(tick);
     };
-    const pause = (ms = 2200) => {
+    const pause = (ms = 1200) => {
       paused = true; clearTimeout(idle);
       idle = setTimeout(() => { paused = false; tick.t0 = 0; }, ms);
     };
     marq.addEventListener('scroll', () => { wrap(); }, { passive: true });
+    /* 触控交给系统横滑，只暂停自动；鼠标仍可拖（勿在 scroll 里 pause，否则自动滚也会被掐掉） */
     marq.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pause(999999);
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
       drag = true; moved = false; sx = e.clientX; sl = marq.scrollLeft;
-      marq.classList.add('is-drag'); pause(999999);
+      marq.classList.add('is-drag');
       try { marq.setPointerCapture(e.pointerId); } catch (_) {}
     });
+    marq.addEventListener('touchstart', () => pause(999999), { passive: true });
+    marq.addEventListener('touchend', () => pause(900), { passive: true });
+    marq.addEventListener('touchcancel', () => pause(900), { passive: true });
     marq.addEventListener('pointermove', (e) => {
       if (!drag) return;
       const dx = e.clientX - sx;
@@ -1078,16 +1085,13 @@
       wrap();
     });
     const endDrag = () => {
-      if (!drag) return;
+      const was = drag;
       drag = false; marq.classList.remove('is-drag');
-      pause(moved ? 1800 : 600);
+      pause(was && moved ? 1000 : 800);
     };
     marq.addEventListener('pointerup', endDrag);
     marq.addEventListener('pointercancel', endDrag);
-    marq.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) pause(1600);
-    }, { passive: true });
-    /* 拖过则不触发放大，避免误开灯箱 */
+    marq.addEventListener('wheel', () => pause(1200), { passive: true });
     marq.addEventListener('click', (e) => {
       if (!moved) return;
       e.preventDefault(); e.stopPropagation(); moved = false;
