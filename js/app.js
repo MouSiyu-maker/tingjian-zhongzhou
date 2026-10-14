@@ -1595,6 +1595,14 @@
     let idx = -1, ticking = false;
     const mid = () => tr.scrollLeft + tr.clientWidth / 2;
     const centerOf = (el) => el.offsetLeft + el.offsetWidth / 2;
+    /* 卡片模式锁上下滑 */
+    const lockY = (e) => {
+      if (!$('#cf')) return;
+      const t = e.target;
+      if (t.closest && (t.closest('.cf-track') || t.closest('.ov-body'))) return;
+      e.preventDefault();
+    };
+    document.addEventListener('touchmove', lockY, { passive: false, signal: sig });
     const update = () => {
       ticking = false;
       const c = mid(); let best = 0, bd = 1e9;
@@ -1605,11 +1613,16 @@
         if (ad < bd) { bd = ad; best = i; }
       });
       if (best !== idx) setActive(best);
+      /* 当前卡强制满亮，避免首尾因对不齐中心而发灰 */
+      if (items[idx]) items[idx].style.setProperty('--k', '1');
       barUpd();
     };
     const setActive = (i) => {
       idx = i; const s = ORDER[i], seg = SEG[s.seg];
-      items.forEach((el, k) => el.classList.toggle('is-on', k === i));
+      items.forEach((el, k) => {
+        el.classList.toggle('is-on', k === i);
+        if (k === i) el.style.setProperty('--k', '1');
+      });
       root.dataset.seg = s.seg;
       $('#cf-cur').textContent = pad(i + 1);
       $('#cf-tag').textContent = `${seg.name} · ${seg.tag}`;
@@ -1658,7 +1671,12 @@
       to(b);
     }));
     bar.addEventListener('keydown', (e) => { const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { to(idx + d); e.preventDefault(); } });
-    const to = (i, smooth = true) => { const el = items[Math.max(0, Math.min(items.length - 1, i))]; tr.scrollTo({ left: centerOf(el) - tr.clientWidth / 2, behavior: smooth && !reduce ? 'smooth' : 'auto' }); };
+    const to = (i, smooth = true) => {
+      const el = items[Math.max(0, Math.min(items.length - 1, i))];
+      const left = Math.max(0, Math.min(tr.scrollWidth - tr.clientWidth, centerOf(el) - tr.clientWidth / 2));
+      tr.scrollTo({ left, behavior: smooth && !reduce ? 'smooth' : 'auto' });
+      setActive(Math.max(0, Math.min(items.length - 1, i)));
+    };
     tr.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
     tr.addEventListener('click', (e) => {
       if (e.target.closest('a, [data-play]')) return;
@@ -1672,7 +1690,7 @@
     window.addEventListener('pointermove', (e) => { if (!down) return; const dx = e.clientX - sx; if (Math.abs(dx) > 4) moved = true; tr.scrollLeft = sl - dx; }, { signal: sig });
     window.addEventListener('pointerup', () => { if (!down) return; down = false; tr.classList.remove('drag'); if (moved) to(idx < 0 ? 0 : (() => { let b = 0, bd = 1e9; items.forEach((el, i) => { const d = Math.abs(centerOf(el) - mid()); if (d < bd) { bd = d; b = i; } }); return b; })()); }, { signal: sig });
     tr.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-    to(cfStart, false); update();
+    requestAnimationFrame(() => { to(cfStart, false); update(); });
   }
 
   function buildRail(on) {
