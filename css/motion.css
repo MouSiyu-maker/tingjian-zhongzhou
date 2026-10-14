@@ -52,17 +52,12 @@
 .smap-go.is-on { background: var(--red); border-color: var(--red); color: #FFF6E4; }
 .smap-go.is-on i { width: 9px; height: 9px; border-top: 0; border-bottom: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
 
-.smap-in .strip.base { filter: grayscale(1) opacity(.34); }
-.smap-in .strip.lit {
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(var(--lit, 0%) - 7%), transparent var(--lit, 0%));
-          mask-image: linear-gradient(90deg, #000 calc(var(--lit, 0%) - 7%), transparent var(--lit, 0%));
-}
-.pin { opacity: .38; filter: grayscale(1); transition: opacity .5s var(--ease), filter .5s var(--ease); }
-.pin.lit { opacity: 1; filter: none; }
-.pin-tag { transform: translateX(-50%) translateY(-10px); transition: transform .5s var(--ease), background .2s; }
-.pin.lit .pin-tag { transform: translateX(-50%); }
-.pin-pic { transform: scale(.78); transition: transform .5s var(--ease) .06s, box-shadow .25s var(--ease); }
-.pin.lit .pin-pic { transform: scale(1); }
+/* 长卷始终全彩，不再灰→金渐进（避免进入页瞬间全灰） */
+.smap-in .strip.base { filter: none; opacity: 1; }
+.smap-in .strip.lit { display: none; }
+.pin { opacity: 1; filter: none; }
+.pin-tag { transform: translateX(-50%); transition: background .2s, box-shadow .2s; }
+.pin-pic { transform: scale(1); transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
 .pin.is-sel { z-index: 4; }
 .pin.is-sel .pin-pic { transform: scale(1.14); box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--red), 0 0 0 10px rgba(158, 64, 42, .16); }
 .pin.is-sel .pin-tag { background: linear-gradient(#7A3020, #5E2416); }
@@ -1030,9 +1025,16 @@
 .pincard .pc-x { position: absolute; right: 4px; top: -10px; width: 24px; height: 24px; border-radius: 50%; background: var(--paper); color: var(--ink-2); font: 400 16px/22px var(--sans); text-align: center; box-shadow: 0 0 0 1px var(--line-2), var(--lift-s); }
 
 /* ---------- 挖掘：不滚动的完整页面 + 渐变蒙层说明 ---------- */
-#app.is-dig, #app.is-one { height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: calc(var(--tab-h) + var(--safe-b)); }
+html:has(#app.is-dig), body:has(#app.is-dig) { overflow: hidden; height: 100%; overscroll-behavior: none; }
+#app.is-dig, #app.is-one { height: 100dvh; min-height: 0; overflow: hidden; padding-bottom: calc(var(--tab-h) + var(--safe-b)); overscroll-behavior: none; }
+#app.is-dig { touch-action: none; }
 #app.is-dig.has-mini, #app.is-one.has-mini { padding-bottom: calc(var(--tab-h) + var(--mini-h) + var(--safe-b)); }
-.dig-page { position: relative; height: 100%; display: flex; flex-direction: column; }
+.dig-page { position: relative; height: 100%; display: flex; flex-direction: column; overflow: hidden; min-height: 0; touch-action: none; }
+.dig-page .smap { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.dig-page .smap-vw { flex: 1; min-height: 0; overflow: hidden; }
+.dig-page .smap-sc { height: 100%; touch-action: pan-x; overscroll-behavior: contain none; }
+.dig-page .sbar { flex: none; touch-action: none; }
+.dig-page .dig-ov { touch-action: pan-y; }
 .dig-head.pagehead.compact { flex: none; padding: var(--pad-head-t) var(--pad-x) 12px; }
 .dig-head .ph-row { align-items: center; }
 .dig-head .h1 { margin-top: 0; }
