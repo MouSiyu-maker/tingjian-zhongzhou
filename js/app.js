@@ -9,6 +9,10 @@
   const paras = (t) => String(t || '').split('\n').filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join('');
   const pad = (n) => String(n).padStart(2, '0');
   const IMG = 'assets/img/';
+  /* GitHub Pages 不展开 LFS（只会下发指针文件），线上改走 media 域名 */
+  const VIDEO = (name) => ((location.hostname || '').endsWith('github.io')
+    ? `https://media.githubusercontent.com/media/MouSiyu-maker/tingjian-zhongzhou/main/assets/video/${name}`
+    : `assets/video/${name}`);
 
   const PLAY = '<svg class="i-play" viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z"/></svg><svg class="i-pause" viewBox="0 0 16 16"><path d="M3.5 2h3v12h-3zM9.5 2h3v12h-3z"/></svg>';
   const playBtn = (key, cls = '') => `<button class="pbtn ${cls}" type="button" data-play="${key}" aria-label="播放 / 暂停">${PLAY}</button>`;
@@ -180,7 +184,7 @@
       v.controls = true; v.playsInline = true; v.preload = 'metadata'; v.setAttribute('playsinline', '');
       v.poster = 'assets/video/workshop-poster.jpg';
       v.setAttribute('aria-label', '“听见中轴”工作坊纪实视频');
-      v.src = 'assets/video/workshop.mp4';
+      v.src = VIDEO('workshop.mp4');
       v.addEventListener('play', () => Player.pause());
       v.addEventListener('error', () => { release(); box.innerHTML = '<div class="vid-err">视频暂时无法加载，请稍后再试</div>'; });
       box.replaceChildren(v);
@@ -1271,7 +1275,7 @@
     };
     const ensureSrc = () => {
       if (ready) return;
-      v.src = 'assets/video/xunsheng.mp4';
+      v.src = VIDEO('xunsheng.mp4');
       ready = true;
     };
     const play = () => {
