@@ -173,11 +173,6 @@
   border: 1px solid var(--red); border-radius: 3px; font: 700 13px/1 var(--serif);
   letter-spacing: .1em; color: var(--red); background: rgba(255, 252, 243, .55); white-space: nowrap;
 }
-.cf-hint { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 2px 0 4px; font: 600 11.5px/1 var(--serif); letter-spacing: .16em; color: var(--ink-2); flex: none; }
-.cf-hint i { width: 22px; height: 1px; background: var(--red); position: relative; animation: cfNudge 1.8s var(--ease) infinite; }
-.cf-hint i::after { content: ""; position: absolute; right: 0; top: -3px; width: 6px; height: 6px; border-top: 1px solid var(--red); border-right: 1px solid var(--red); transform: rotate(45deg); }
-@keyframes cfNudge { 0%, 100% { transform: translateX(-3px); } 50% { transform: translateX(4px); } }
-
 .cf .cf-bar { flex: none; padding: 8px 16px 12px; }
 
 /* ---------- 滚动入场 ---------- */
@@ -941,35 +936,28 @@
   .exb-cast img { animation: none; }
 }
 
-/* 现场图片：头接尾无限横向滑动 */
+/* 现场图片：自动滚动 + 手动横滑（双份内容，过半回绕） */
 .exb-field { overflow: hidden; }
 .exb-marq {
-  margin: 14px calc(-1 * var(--pad-x)) 0; overflow: hidden;
+  margin: 14px calc(-1 * var(--pad-x)) 0;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; touch-action: pan-x;
+  overscroll-behavior-x: contain; cursor: grab;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
-.exb-marq-track {
-  display: flex; width: max-content;
-  animation: exbMarq 48s linear infinite; will-change: transform;
-}
+.exb-marq::-webkit-scrollbar { display: none; }
+.exb-marq.is-drag { cursor: grabbing; scroll-snap-type: none; }
+.exb-marq-track { display: flex; width: max-content; }
 .exb-marq-set { display: flex; gap: 10px; padding-right: 10px; }
-.exb-marq:hover .exb-marq-track,
-.exb-marq:focus-within .exb-marq-track,
-.exb-marq.is-hold .exb-marq-track { animation-play-state: paused; }
 .exb-marq-i {
   flex: none; width: min(70vw, 260px); aspect-ratio: 16 / 10; margin: 0;
   border-radius: 10px; overflow: hidden; cursor: zoom-in; background: var(--paper-2);
-  box-shadow: 0 0 0 1px var(--line);
+  box-shadow: 0 0 0 1px var(--line); scroll-snap-align: start;
 }
 .exb-marq-i img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-@keyframes exbMarq {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
 @media (prefers-reduced-motion: reduce) {
-  .exb-marq { overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
-  .exb-marq-track { animation: none; padding-bottom: 4px; }
-  .exb-marq-i { scroll-snap-align: start; }
+  .exb-marq { scroll-snap-type: x proximity; }
 }
 
 .exb-more[open] {

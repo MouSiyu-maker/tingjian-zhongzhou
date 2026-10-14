@@ -353,7 +353,6 @@
       <div class="cf-bgs" aria-hidden="true">${bgs}</div>
       <div class="cf-count"><b id="cf-cur">01</b><span>/ ${pad(ORDER.length)}</span><em id="cf-tag">南段 · 皇家礼乐</em></div>
       <div class="cf-track" id="cf-track">${items}</div>
-      <div class="cf-hint"><i></i>左右滑动 · 由南向北</div>
       <div class="sbar cf-bar" id="cf-bar" role="slider" tabindex="0" aria-label="声音位置，左右拖动" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="南段">
         <div class="sb-row">${bar}<b class="sb-th" id="cf-th"></b></div>
       </div>
@@ -1000,6 +999,7 @@
       return;
     }
     teardownCreate();
+    if (showFieldAbort) showFieldAbort();
     let html = '', tab = r;
     if (r === 'home') html = home();
     else if (r === 'dig') html = dig();
@@ -1036,15 +1036,66 @@
     });
   }
 
-  /* 传播页：现场图无限滑动 — 按住暂停 */
+  /* 传播页：现场图 — 自动滚动 + 手指/鼠标横滑 */
+  let showFieldAbort = null;
   function initShowField() {
+    if (showFieldAbort) showFieldAbort();
     const marq = $('.exb-marq'); if (!marq) return;
-    const hold = () => marq.classList.add('is-hold');
-    const release = () => marq.classList.remove('is-hold');
-    marq.addEventListener('pointerdown', hold);
-    marq.addEventListener('pointerup', release);
-    marq.addEventListener('pointercancel', release);
-    marq.addEventListener('pointerleave', release);
+    const track = $('.exb-marq-track', marq); if (!track) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const half = () => track.scrollWidth / 2;
+    const wrap = () => {
+      const h = half(); if (h < 8) return;
+      if (marq.scrollLeft >= h) marq.scrollLeft -= h;
+      else if (marq.scrollLeft < 0) marq.scrollLeft += h;
+    };
+    let raf = 0, paused = false, idle = 0, drag = false, moved = false, sx = 0, sl = 0;
+    const tick = (t) => {
+      if (!paused && !reduce) {
+        if (!tick.t0) tick.t0 = t;
+        const dt = Math.min(48, t - tick.t0); tick.t0 = t;
+        marq.scrollLeft += dt * 0.028;   // ≈ 48s 滚完半轨
+        wrap();
+      } else tick.t0 = t;
+      raf = requestAnimationFrame(tick);
+    };
+    const pause = (ms = 2200) => {
+      paused = true; clearTimeout(idle);
+      idle = setTimeout(() => { paused = false; tick.t0 = 0; }, ms);
+    };
+    marq.addEventListener('scroll', () => { wrap(); }, { passive: true });
+    marq.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      drag = true; moved = false; sx = e.clientX; sl = marq.scrollLeft;
+      marq.classList.add('is-drag'); pause(999999);
+      try { marq.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    marq.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - sx;
+      if (Math.abs(dx) > 4) moved = true;
+      marq.scrollLeft = sl - dx;
+      wrap();
+    });
+    const endDrag = () => {
+      if (!drag) return;
+      drag = false; marq.classList.remove('is-drag');
+      pause(moved ? 1800 : 600);
+    };
+    marq.addEventListener('pointerup', endDrag);
+    marq.addEventListener('pointercancel', endDrag);
+    marq.addEventListener('wheel', (e) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) pause(1600);
+    }, { passive: true });
+    /* 拖过则不触发放大，避免误开灯箱 */
+    marq.addEventListener('click', (e) => {
+      if (!moved) return;
+      e.preventDefault(); e.stopPropagation(); moved = false;
+    }, true);
+    if (!reduce) raf = requestAnimationFrame(tick);
+    showFieldAbort = () => {
+      cancelAnimationFrame(raf); clearTimeout(idle); showFieldAbort = null;
+    };
   }
 
   /* ---------- 创化：切换 / 初始化 / 清理 ---------- */
