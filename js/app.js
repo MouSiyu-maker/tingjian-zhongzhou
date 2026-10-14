@@ -606,7 +606,10 @@
       <section class="hub">
         ${card('hc-mu', '#/create/music', `<div class="hc-disc"><img src="${IMG}ip-char-zhonghe.png" alt=""></div>`, '01', 'Music', '二创音乐', 'AI 创作的四段二创主题音乐', `<span class="hc-bars">${bars}</span>${TRACKS.length} 段主题音乐`)}
         ${card('hc-ip', '#/create/ip', `<img src="${IMG}ip-char-kunqu.png" alt=""><img src="${IMG}ip-char-jiaomai.png" alt="">`, '02', 'IP · Merchandise', 'IP · 文创', '品牌 IP“凸嘟”、动画《寻声》与文创', `${FORMS.length} 种声音元素 · 四类文创矩阵`)}
-        ${card('hc-ev', '#/create/events', `<img src="${IMG}ip-scene-kunqu.jpg" alt=""><img src="${IMG}ip-scene-jiaomai.jpg" alt=""><img src="${IMG}ip-scene-gengshao.jpg" alt="">`, '03', 'Scenes', '场景活动', '三大核心应用场景活动', `${EVENTS.length} 项 · 儿童 · 青年 · 长者`)}
+        ${card('hc-ev', '#/create/events', EVENTS.map((e) => {
+          const p = EVENT_DETAIL[e.id]?.photos?.poster || `events/${e.id}/poster.jpg`;
+          return `<img src="${IMG}${p}" alt="${esc(e.name)}">`;
+        }).join(''), '03', 'Scenes', '场景活动', '三大核心应用场景活动', `${EVENTS.length} 项 · 儿童 · 青年 · 长者`)}
       </section>
     </div>`;
   }
